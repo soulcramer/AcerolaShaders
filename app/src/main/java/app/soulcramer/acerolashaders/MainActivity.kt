@@ -3,6 +3,7 @@ package app.soulcramer.acerolashaders
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Arrangement.Absolute.spacedBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,6 +24,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import app.soulcramer.acerolashaders.ui.shaders.colorblindness.ColorBlindScreen
+import app.soulcramer.acerolashaders.ui.shaders.crt.CrtScreen
 import app.soulcramer.acerolashaders.ui.theme.AcerolaShadersTheme
 
 class MainActivity : ComponentActivity() {
@@ -51,12 +53,19 @@ fun Home(
 ) {
     LazyColumn(
         modifier = modifier,
-        contentPadding = PaddingValues(16.dp)
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = spacedBy(16.dp),
     ) {
         item {
             ShaderItem(
                 shaderName = "Color Blindness",
                 onItemClick = { onShaderClick("colorBlindShader") }
+            )
+        }
+        item {
+            ShaderItem(
+                shaderName = "CRT",
+                onItemClick = { onShaderClick("crtShader") }
             )
         }
     }
@@ -96,6 +105,7 @@ fun AppNavHost(
             )
         }
         composable("colorBlindShader") { ColorBlindScreen(modifier = modifier) }
+        composable("crtShader") { CrtScreen(modifier = modifier) }
     }
 }
 
