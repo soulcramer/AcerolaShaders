@@ -3,10 +3,17 @@ package app.soulcramer.acerolashaders.ui.shaders.colorblindness
 import android.graphics.RenderEffect
 import android.graphics.RuntimeShader
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -15,8 +22,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import app.soulcramer.acerolashaders.ui.components.SegmentedButton
+import app.soulcramer.acerolashaders.ui.theme.AcerolaShadersTheme
 import coil.compose.AsyncImage
+import kotlin.math.roundToInt
 
 val shader = ColorBlindness + """
 uniform float severity;
@@ -30,8 +41,8 @@ half4 main(float2 coord) {
     int p2 = int(min(10, floor((severity + 0.1) * 10.0)));
     float weight = fract(severity * 10.0);
 
-    float3x3 matrix1 = getColorBlindnessMatrix(0, p1);
-    float3x3 matrix2 = getColorBlindnessMatrix(0, p2);
+    float3x3 matrix1 = getColorBlindnessMatrix(colorblindType, p1);
+    float3x3 matrix2 = getColorBlindnessMatrix(colorblindType, p2);
 
     float3 newCB1 = mix(matrix1[0], matrix2[0], weight);
     float3 newCB2 = mix(matrix1[1], matrix2[1], weight);
@@ -56,9 +67,10 @@ fun ColorBlindScreen(
         AsyncImage(
             model = imageUrl,
             contentDescription = "",
-            contentScale = ContentScale.Fit,
+            contentScale = ContentScale.Crop,
             modifier = Modifier
                 .fillMaxWidth()
+                .heightIn(max = 300.dp)
                 .graphicsLayer {
                     clip = true
                     renderEffect = RenderEffect
@@ -70,9 +82,22 @@ fun ColorBlindScreen(
                 }
         )
         var severity by remember { mutableStateOf(0.5f) }
+        val severityLabel by remember {
+            derivedStateOf {
+                (severity * 10).roundToInt()
+            }
+        }
         runtimeShader.setFloatUniform("severity", severity)
+
+        Text(
+            text = "Severity: $severityLabel",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .padding(top = 16.dp)
+        )
         Slider(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(horizontal = 16.dp),
             value = severity,
             valueRange = 0f..1f,
             steps = 10,
@@ -80,5 +105,51 @@ fun ColorBlindScreen(
                 severity = it
             }
         )
+
+
+        Text(
+            text = "Color blindness type",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .padding(top = 16.dp)
+        )
+
+        val options = ColorBlindNessType.values().map { it.name }
+        var selectedOption by remember {
+            mutableStateOf(options.first())
+        }
+        runtimeShader.setIntUniform(
+            "colorblindType",
+            ColorBlindNessType.valueOf(selectedOption).ordinal
+        )
+
+        SegmentedButton(
+            options = options,
+            selectedOption = selectedOption,
+            onOptionSelect = { option ->
+                selectedOption = option
+            },
+            modifier = Modifier
+                .padding(all = 16.dp)
+                .fillMaxWidth()
+                .height(48.dp),
+        )
+    }
+}
+
+enum class ColorBlindNessType {
+    Deuteranomaly,
+    Protanomaly,
+    Tritanomaly,
+}
+
+@Preview
+@Composable
+private fun ColorBlindScreenPreview() {
+    AcerolaShadersTheme {
+        Surface {
+            ColorBlindScreen(modifier = Modifier.fillMaxSize())
+        }
     }
 }

@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
-
+                    AppNavHost(navController = navController)
                 }
             }
         }
@@ -47,7 +47,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Home(
     modifier: Modifier = Modifier,
-    navController: NavHostController,
+    onShaderClick: (destination: String) -> Unit,
 ) {
     LazyColumn(
         modifier = modifier,
@@ -56,7 +56,7 @@ fun Home(
         item {
             ShaderItem(
                 shaderName = "Color Blindness",
-                onItemClick = { navController.navigate("colorBlindShader") }
+                onItemClick = { onShaderClick("colorBlindShader") }
             )
         }
     }
@@ -89,7 +89,12 @@ fun AppNavHost(
         navController = navController,
         startDestination = "home"
     ) {
-        composable("home") { Home(navController = navController, modifier = modifier) }
+        composable("home") {
+            Home(
+                modifier = modifier,
+                onShaderClick = { navController.navigate(it) }
+            )
+        }
         composable("colorBlindShader") { ColorBlindScreen(modifier = modifier) }
     }
 }
@@ -98,7 +103,10 @@ fun AppNavHost(
 @Composable
 fun HomePreview() {
     AcerolaShadersTheme {
-        Home(Modifier.fillMaxSize())
+        Home(
+            modifier = Modifier.fillMaxSize(),
+            onShaderClick = {}
+        )
     }
 }
 
