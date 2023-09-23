@@ -26,8 +26,6 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import app.soulcramer.acerolashaders.ui.shaders.colorblindness.ColorBlindScreen
-import app.soulcramer.acerolashaders.ui.shaders.colorblindness.ColorBlindness
 import app.soulcramer.acerolashaders.ui.theme.AcerolaShadersTheme
 import coil.compose.AsyncImage
 import kotlin.math.roundToInt
