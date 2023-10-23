@@ -2,6 +2,11 @@ package app.soulcramer.acerolashaders.ui.shaders.colorblindness
 
 import android.graphics.RenderEffect
 import android.graphics.RuntimeShader
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,11 +27,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import app.soulcramer.acerolashaders.R
 import app.soulcramer.acerolashaders.ui.components.SegmentedButton
 import app.soulcramer.acerolashaders.ui.theme.AcerolaShadersTheme
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import kotlin.math.roundToInt
 
 val shader = ColorBlindness + """
@@ -64,13 +72,36 @@ fun ColorBlindScreen(
     Column(modifier) {
         val runtimeShader = RuntimeShader(shader)
 
+        var imageUri: Any? by remember { mutableStateOf(R.drawable.ic_launcher_background) }
+
+        val photoPicker = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.PickVisualMedia()
+        ) {
+            if (it != null) {
+                Log.d("PhotoPicker", "Selected URI: $it")
+                imageUri = it
+            } else {
+                Log.d("PhotoPicker", "No media selected")
+            }
+        }
+
         AsyncImage(
-            model = imageUrl,
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(imageUri)
+                .crossfade(enable = true)
+                .build(),
             contentDescription = "",
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(max = 300.dp)
+                .clickable {
+                    photoPicker.launch(
+                        PickVisualMediaRequest(
+                            ActivityResultContracts.PickVisualMedia.ImageOnly
+                        )
+                    )
+                }
                 .graphicsLayer {
                     clip = true
                     renderEffect = RenderEffect
