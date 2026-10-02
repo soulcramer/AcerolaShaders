@@ -25,14 +25,11 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.assign
+import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
-import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.withType
-import org.jetbrains.dokka.base.DokkaBase
-import org.jetbrains.dokka.base.DokkaBaseConfiguration
-import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
-import org.jetbrains.dokka.gradle.DokkaTask
-import org.jetbrains.dokka.gradle.DokkaTaskPartial
+import org.jetbrains.dokka.gradle.DokkaExtension
+import org.jetbrains.dokka.gradle.engine.plugins.DokkaHtmlPluginParameters
 import java.io.File
 import java.net.URI
 import java.time.Year
@@ -47,60 +44,61 @@ internal class ShadersDokkaPlugin : Plugin<Project> {
                 else -> configureSubProject()
             }
 
-            tasks.withType<DokkaTask>().configureEach {
-                notCompatibleWithConfigurationCache("https://github.com/Kotlin/dokka/issues/1217")
-            }
-
             dependencies {
-                add("dokkaHtmlPlugin", spark().libraries.`dokka-android-documentation-plugin`)
+                add("dokkaPlugin", spark().libraries.`dokka-android-documentation-plugin`)
             }
         }
     }
 
-    private fun Project.configureRootProject() = tasks.named<DokkaMultiModuleTask>("dokkaHtmlMultiModule") {
+    private fun Project.configureRootProject() = configure<DokkaExtension> {
         moduleName = "Spark"
-        outputDirectory = layout.buildDirectory.dir("dokka")
-        pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
+        dokkaPublications.named("html") {
+            outputDirectory = layout.buildDirectory.dir("dokka")
+        }
+        pluginsConfiguration.withType<DokkaHtmlPluginParameters>().configureEach {
             fun File.recursiveAssets() = walk().filter(File::isFile)
                 // https://github.com/Kotlin/dokka/issues/3400
                 .filter { runCatching { URI(it.name) }.isSuccess }
-                .toList().toTypedArray()
+                .toList()
             // https://kotlinlang.org/docs/dokka-html.html#customize-assets
-            customAssets = listOf(
+            customAssets.from(
                 file("art/logo-icon.svg"), // https://kotlinlang.org/docs/dokka-html.html#change-the-logo
-                *rootDir.resolve("art").recursiveAssets(),
-                *rootDir.resolve("spark-screenshot-testing/src/test/snapshots/images").recursiveAssets(),
+                rootDir.resolve("art").recursiveAssets(),
+                rootDir.resolve("spark-screenshot-testing/src/test/snapshots/images").recursiveAssets(),
             )
             configureFooterMessage()
         }
     }
 
-    private fun Project.configureSubProject() = tasks.withType<DokkaTaskPartial>().configureEach {
-        dokkaSourceSets.configureEach {
-            // Parse Module and Package docs
-            // https://kotlinlang.org/docs/dokka-module-and-package-docs.html
-            projectDir.resolve("src").walk()
-                .filter { it.isFile && it.extension == "md" }.toList()
-                .let { includes.from(project.files(), it) }
+    private fun Project.configureSubProject() {
+        // Aggregate this module into the root project documentation
+        rootProject.dependencies.add("dokka", rootProject.dependencies.project(mapOf("path" to path)))
 
-            // List of files or directories containing sample code (referenced with @sample tags)
-            projectDir.resolve("samples").walk()
-                .filter { it.isFile && it.extension == "kt" }.toList()
-                .let { samples.from(it) }
+        configure<DokkaExtension> {
+            dokkaSourceSets.configureEach {
+                // Parse Module and Package docs
+                // https://kotlinlang.org/docs/dokka-module-and-package-docs.html
+                projectDir.resolve("src").walk()
+                    .filter { it.isFile && it.extension == "md" }.toList()
+                    .let { includes.from(project.files(), it) }
 
-            // https://kotlinlang.org/docs/dokka-gradle.html#source-link-configuration
-            // FIXME(android): https://github.com/Kotlin/dokka/issues/2876
-            sourceLink {
-                val url = "https://github.com/Adevinta/spark-android/tree/main/${project.name}/src/main/kotlin"
-                localDirectory = projectDir.resolve("src")
-                remoteUrl = URI(url).toURL()
-                remoteLineSuffix = "#L"
+                // List of files or directories containing sample code (referenced with @sample tags)
+                projectDir.resolve("samples").walk()
+                    .filter { it.isFile && it.extension == "kt" }.toList()
+                    .let { samples.from(it) }
+
+                // https://kotlinlang.org/docs/dokka-gradle.html#source-link-configuration
+                sourceLink {
+                    localDirectory = projectDir.resolve("src")
+                    remoteUrl("https://github.com/Adevinta/spark-android/tree/main/${project.name}/src/main/kotlin")
+                    remoteLineSuffix = "#L"
+                }
             }
+            pluginsConfiguration.withType<DokkaHtmlPluginParameters>().configureEach { configureFooterMessage() }
         }
-        pluginConfiguration<DokkaBase, DokkaBaseConfiguration> { configureFooterMessage() }
     }
 
-    private fun DokkaBaseConfiguration.configureFooterMessage() {
+    private fun DokkaHtmlPluginParameters.configureFooterMessage() {
         footerMessage = "© ${Year.now().value} Adevinta"
     }
 }

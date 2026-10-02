@@ -40,9 +40,11 @@ android {
         unitTests.isIncludeAndroidResources = true
         unitTests.isReturnDefaultValues = true
     }
+}
 
-    kotlinOptions {
-        freeCompilerArgs += listOf(
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.addAll(
             "-opt-in=app.soulcramer.shaders.InternalSparkApi",
             "-opt-in=app.soulcramer.shaders.ExperimentalSparkApi",
         )

@@ -29,7 +29,6 @@ import org.gradle.kotlin.dsl.dependencies
 internal class ShadersAndroidComposePlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
-            apply(plugin = "org.jetbrains.kotlin.android")
             apply(plugin = "org.jetbrains.kotlin.plugin.compose")
             apply(plugin = "app.soulcramer.shaders.android")
 

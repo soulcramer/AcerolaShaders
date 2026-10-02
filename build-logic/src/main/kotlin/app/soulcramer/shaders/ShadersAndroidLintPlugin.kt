@@ -37,7 +37,6 @@ internal class ShadersAndroidLintPlugin : Plugin<Project> {
 
             configure<Lint> {
                 warningsAsErrors = true
-                sarifReport = true
             }
         }
     }

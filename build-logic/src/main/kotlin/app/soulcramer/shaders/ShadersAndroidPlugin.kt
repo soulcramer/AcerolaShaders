@@ -23,28 +23,20 @@ package app.soulcramer.shaders
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.apply
 import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import java.io.File
 
 public class ShadersAndroidPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
-            apply(plugin = "org.jetbrains.kotlin.android")
-
             configureKotlin<KotlinAndroidProjectExtension>()
 
             configureAndroid {
                 compileSdk = spark().versions.compileSdk.toString().toInt()
                 defaultConfig.minSdk = spark().versions.minCompileSdk.toString().toInt()
-                packaging {
-                    resources {
-                        excludes += "/META-INF/{AL2.0,LGPL2.1}"
-                    }
-                }
-                lint {
+                packaging.resources.excludes += "/META-INF/{AL2.0,LGPL2.1}"
+                lint.apply {
                     warningsAsErrors = true
-                    sarifReport = true
                     lintConfig = file("lint.xml").takeIf(File::exists)
                 }
             }

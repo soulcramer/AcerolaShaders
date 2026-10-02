@@ -21,7 +21,7 @@
  */
 package app.soulcramer.shaders
 
-import com.android.build.gradle.LibraryExtension
+import com.android.build.api.dsl.LibraryExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.publish.PublishingExtension
@@ -30,7 +30,6 @@ import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.get
-import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.the
 import org.gradle.plugins.signing.SigningExtension
@@ -118,8 +117,8 @@ internal class ShadersPublishingPlugin : Plugin<Project> {
     }
 
     private fun Project.configureSigning() = configure<SigningExtension> signing@{
-        val signingKey: String? by project
-        val signingPassword: String? by project
+        val signingKey = findProperty("signingKey") as String?
+        val signingPassword = findProperty("signingPassword") as String?
         if (signingKey == null || signingPassword == null) return@signing
         useInMemoryPgpKeys(signingKey, signingPassword)
         sign(the<PublishingExtension>().publications)

@@ -40,20 +40,13 @@ android {
 
     compileOptions.isCoreLibraryDesugaringEnabled = true
 
-    kotlinOptions {
-        freeCompilerArgs += listOf(
-            "-opt-in=app.soulcramer.shaders.InternalSparkApi",
-            "-opt-in=app.soulcramer.shaders.ExperimentalSparkApi",
-        )
-    }
-
     val keystore = rootProject.file("keystore.properties")
         .takeIf { it.exists() }
         ?.let { Properties().apply { load(it.inputStream()) } }
 
-    val debug by signingConfigs.getting
-    val release by signingConfigs.creating {
-        if (keystore == null) return@creating
+    val debug = signingConfigs.getByName("debug")
+    val release = signingConfigs.create("release") {
+        if (keystore == null) return@create
         keyAlias = keystore.getProperty("keyAlias")
         keyPassword = keystore.getProperty("keyPassword")
         storeFile = file(keystore.getProperty("storeFile"))
@@ -62,6 +55,15 @@ android {
 
     buildTypes.named("release") {
         signingConfig = if (keystore != null) release else debug
+    }
+}
+
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.addAll(
+            "-opt-in=app.soulcramer.shaders.InternalSparkApi",
+            "-opt-in=app.soulcramer.shaders.ExperimentalSparkApi",
+        )
     }
 }
 
