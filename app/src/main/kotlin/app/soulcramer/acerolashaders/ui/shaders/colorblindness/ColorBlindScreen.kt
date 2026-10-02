@@ -33,8 +33,9 @@ import androidx.compose.ui.unit.dp
 import app.soulcramer.acerolashaders.R
 import app.soulcramer.acerolashaders.ui.components.SegmentedButton
 import app.soulcramer.acerolashaders.ui.theme.AcerolaShadersTheme
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import kotlin.math.roundToInt
 
 val shader = ColorBlindness + """
