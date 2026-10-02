@@ -1,0 +1,97 @@
+name: '👷 Build → 🧑‍🔬 Test → 🕵️ Lint'
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  merge_group:
+    types: [ checks_requested ]
+    branches: ["main"]
+
+concurrency:
+  group: '${{ github.workflow }}-${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
+  cancel-in-progress: true
+
+jobs:
+
+  validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/check-git-lfs
+      - uses: ./.github/actions/setup-java
+      - uses: ./.github/actions/setup-gradle
+      - uses: ./.github/actions/setup-gradle-properties
+      - run: ./gradlew dependencyGuard --quiet
+      - run: ./gradlew spotlessCheck :build-logic:spotlessCheck
+
+  build-test-lint:
+    needs: validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+      - uses: ./.github/actions/setup-java
+      - uses: ./.github/actions/setup-gradle
+      - uses: ./.github/actions/setup-gradle-properties
+
+      - name: '👷 Build'
+        id: build
+        run: ./gradlew assembleRelease
+      - name: '📦 Archive APKs'
+        uses: actions/upload-artifact@v4
+        with:
+          name: apk
+          path: '**/build/outputs/apk/**/*.apk'
+      - name: '📦 Archive AARs'
+        uses: actions/upload-artifact@v4
+        with:
+          name: aar
+          path: '**/build/outputs/aar'
+      - name: '📢 Diffuse reports'
+        if: ${{ always() && github.event_name == 'pull_request' && steps.build.outcome == 'success' }}
+        uses: ./.github/actions/diffuse-aar
+
+      - name: '🧑‍🔬 Test'
+        id: test
+        run: ./gradlew globalCiUnitTest
+      - name: '📦 Archive JUnit reports'
+        if: ${{ always() && contains(fromJSON('["success", "failure"]'), steps.test.outcome) }}
+        uses: ./.github/actions/archive-junit-reports
+        with:
+          html: '**/build/reports/tests/test*'
+          xml: '**/build/test-results/test*/**.xml'
+
+      - name: '🕵️ Lint'
+        id: lint
+        run: ./gradlew lintRelease
+      - name: '📦 Archive Lint reports'
+        if: ${{ always() && contains(fromJSON('["success", "failure"]'), steps.lint.outcome) }}
+        uses: ./.github/actions/archive-lint-reports
+        with:
+          analysis: './'
+          html: '**/build/reports/lint-results-*.html'
+          sarif: '**/build/reports/lint-results-*.sarif'
+          xml: '**/build/reports/lint-results-*.xml'
+
+  dokka:
+    needs: validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-java
+      - uses: ./.github/actions/setup-gradle
+      - uses: ./.github/actions/setup-gradle-properties
+
+      - name: '📋 Build Dokka'
+        # https://github.com/Kotlin/dokka/issues/1217
+        run: ./gradlew dokkaHtmlMultiModule --no-configuration-cache --no-parallel --max-workers=1
+      - name: '📦 Archive Dokka'
+        uses: actions/upload-artifact@v4
+        with:
+          name: dokka
+          path: 'build/dokka'
