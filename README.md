@@ -27,7 +27,7 @@ Gradle resolves the required JDK on first run through the Foojay toolchain plugi
 | Effect | Upstream source | Status |
 |---|---|---|
 | Colour blindness simulation (protanomaly, deuteranomaly, tritanomaly) | `AcerolaFX_ColorBlindness.fx` in AcerolaFX | Ported |
-| CRT screen (barrel warp, scanline colour fringing, vignette) | CRT-Shader, and `AcerolaFX_CRT.fx` in AcerolaFX | Ported |
+| CRT screen (barrel warp, scanline colour fringing, vignette) | `AcerolaFX_CRT.fx` in AcerolaFX | Ported |
 
 The CRT effect lives in the `app` module only. It is not published as a library.
 
@@ -69,13 +69,8 @@ Attach the shader as a `RenderEffect` through `graphicsLayer`, with `composable`
 
 ## Credits
 
-The shaders are ports of effects by Garrett Gunnell (Acerola):
-
-- [AcerolaFX](https://github.com/GarrettGunnell/AcerolaFX): the colour-blindness simulation.
-- [CRT-Shader](https://github.com/GarrettGunnell/CRT-Shader): the CRT screen effect.
-
-Both upstream projects use the MIT licence.
+The shaders are ports of effects from [AcerolaFX](https://github.com/GarrettGunnell/AcerolaFX) by Garrett Gunnell (Acerola), which uses the MIT licence. [CRT-Shader](https://github.com/GarrettGunnell/CRT-Shader) shows the same CRT effect in Unity, but this project copies no code from it.
 
 ## Licence
 
-MIT, as declared in the publishing configuration. No `LICENSE` file exists in this repository yet.
+MIT. See [the LICENSE file](LICENSE), which also contains the AcerolaFX copyright notice.
