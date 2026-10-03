@@ -19,7 +19,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,22 +44,12 @@ internal fun SegmentedButton(
     modifier: Modifier = Modifier,
     selectedColor: Color = MaterialTheme.colorScheme.onSecondaryContainer,
     unselectedcolor: Color = LocalContentColor.current,
-//    state: MultiSelectorState = rememberMultiSelectorState(
-//        options = options,
-//        selectedOption = selectedOption,
-//    ),
 ) {
     require(options.size >= 2) { "This composable requires at least 2 options" }
     require(options.size <= 5) { "This composable requires at most 5 options" }
     require(options.contains(selectedOption)) { "Invalid selected option [$selectedOption]" }
 
-    val selectedIndex by remember(options, selectedOption) {
-        mutableStateOf(
-            options.indexOf(
-                selectedOption,
-            ),
-        )
-    }
+    val selectedIndex = options.indexOf(selectedOption)
 
     val backgroundProgress by animateFloatAsState(
         label = "Background Position Progress",
@@ -153,54 +142,6 @@ internal fun SegmentedButton(
             }
         }
     }
-}
-
-private val animationSpec = spring<Int>()
-
-@Stable
-internal interface MultiSelectorState {
-    val selectedIndex: Int
-    fun selectOption(index: Int)
-}
-
-@Stable
-internal class MultiSelectorStateImpl(
-    options: List<String>,
-    selectedOption: String,
-) : MultiSelectorState {
-
-    override val selectedIndex: Int
-        get() = _selectedIndex
-
-    private var _selectedIndex = options.indexOf(selectedOption)
-
-    override fun selectOption(index: Int) {
-        _selectedIndex = index
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as MultiSelectorStateImpl
-
-        return _selectedIndex == other._selectedIndex
-    }
-
-    override fun hashCode(): Int {
-        return _selectedIndex.hashCode()
-    }
-}
-
-@Composable
-internal fun rememberMultiSelectorState(
-    options: List<String>,
-    selectedOption: String,
-) = remember {
-    MultiSelectorStateImpl(
-        options,
-        selectedOption,
-    )
 }
 
 internal enum class MultiSelectorOption {

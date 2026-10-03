@@ -20,7 +20,6 @@
  * SOFTWARE.
  */
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import kotlin.reflect.KProperty
 
 plugins {
     `kotlin-dsl`
@@ -45,10 +44,8 @@ repositories {
 }
 
 dependencies {
-    compileOnly(gradleApi())
     compileOnly(libs.gradlePlugins.android)
     compileOnly(libs.gradlePlugins.kotlin)
-    compileOnly(libs.gradlePlugins.ksp)
     compileOnly(libs.gradlePlugins.compose)
     compileOnly(libs.gradlePlugins.dependencyGuard)
     compileOnly(libs.gradlePlugins.dokka)
@@ -60,13 +57,13 @@ gradlePlugin {
     plugins {
         create("app.soulcramer.shaders.ShadersRootPlugin", id = "app.soulcramer.shaders.root")
         create("app.soulcramer.shaders.ShadersAndroidPlugin", id = "app.soulcramer.shaders.android")
-        create("app.soulcramer.shaders.ShadersAndroidApplicationPlugin", id = "app.soulcramer.shaders.android-application")
+        create(
+            "app.soulcramer.shaders.ShadersAndroidApplicationPlugin",
+            id = "app.soulcramer.shaders.android-application",
+        )
         create("app.soulcramer.shaders.ShadersAndroidLibraryPlugin", id = "app.soulcramer.shaders.android-library")
         create("app.soulcramer.shaders.ShadersAndroidComposePlugin", id = "app.soulcramer.shaders.android-compose")
-        create("app.soulcramer.shaders.ShadersAndroidLintPlugin", id = "app.soulcramer.shaders.android-lint")
         create("app.soulcramer.shaders.ShadersPublishingPlugin", id = "app.soulcramer.shaders.publishing")
-        create("app.soulcramer.shaders.ShadersKotlinJvmPlugin", id = "app.soulcramer.shaders.kotlin-jvm")
-        create("app.soulcramer.shaders.ShadersKspPlugin", id = "app.soulcramer.shaders.ksp")
         create("app.soulcramer.shaders.ShadersDokkaPlugin", id = "app.soulcramer.shaders.dokka")
         create("app.soulcramer.shaders.ShadersDependencyGuardPlugin", id = "app.soulcramer.shaders.dependencyGuard")
         create("app.soulcramer.shaders.ShadersSpotlessPlugin", id = "app.soulcramer.shaders.spotless")
@@ -82,36 +79,23 @@ fun NamedDomainObjectContainer<PluginDeclaration>.create(
     this.implementationClass = implementationClass
 }
 
-private operator fun VersionCatalog.getValue(
-    thisRef: Any?,
-    property: KProperty<*>,
-) = findVersion(property.name).orElseThrow {
-    IllegalStateException("Missing catalog version ${property.name}")
-}
+val ktlint = libs.versions.ktlint.get()
 
-val ktlint: VersionConstraint by extensions.getByType<VersionCatalogsExtension>().named("libs")
-
-// This block is a copy of SparkSpotlessPlugin since this included build can't use it's own plugins...
+// This block is a copy of ShadersSpotlessPlugin since this included build can't use its own plugins...
 spotless {
-    val licenseHeader = rootProject.file("./../spotless/spotless.kt")
     format("misc") {
         target("**/*.md", "**/.gitignore")
         endWithNewline()
     }
     kotlin {
         target("src/**/*.kt")
-        ktlint(ktlint.toString())
+        ktlint(ktlint)
         trimTrailingWhitespace()
         endWithNewline()
-        licenseHeaderFile(licenseHeader)
     }
     kotlinGradle {
-        ktlint(ktlint.toString())
+        ktlint(ktlint)
         trimTrailingWhitespace()
         endWithNewline()
-        licenseHeaderFile(
-            licenseHeader,
-            "(import |plugins|pluginManagement|rootProject|dependencyResolutionManagement|//)",
-        )
     }
 }

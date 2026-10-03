@@ -43,7 +43,6 @@ internal class ShadersSpotlessPlugin : Plugin<Project> {
                     ktlint(ktlint.toString())
                     trimTrailingWhitespace()
                     endWithNewline()
-                    targetExclude("spotless/*.kt")
                 }
                 kotlinGradle {
                     ktlint(ktlint.toString())

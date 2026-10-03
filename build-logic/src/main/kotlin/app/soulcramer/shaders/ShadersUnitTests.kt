@@ -53,26 +53,7 @@ internal object ShadersUnitTests {
         project.pluginManager.withPlugin("com.android.base") {
             createAndroidCiUnitTestTask(project, globalTask)
         }
-        project.pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
-            createJvmCiUnitTestTask(project, globalTask)
-        }
         configureTestTasks(project)
-    }
-
-    private fun createJvmCiUnitTestTask(
-        project: Project,
-        globalTask: TaskProvider<Task>,
-    ) {
-        project.logger.debug("$LOG Creating CI unit test tasks for project '$project'")
-        val ciUnitTest = project.tasks.register(CI_UNIT_TEST_TASK_NAME) {
-            group = LifecycleBasePlugin.VERIFICATION_GROUP
-            dependsOn("test")
-        }
-        globalTask.configure { dependsOn(ciUnitTest) }
-        project.tasks.register(COMPILE_CI_UNIT_TEST_NAME) {
-            group = LifecycleBasePlugin.VERIFICATION_GROUP
-            dependsOn("testClasses")
-        }
     }
 
     private fun createAndroidCiUnitTestTask(

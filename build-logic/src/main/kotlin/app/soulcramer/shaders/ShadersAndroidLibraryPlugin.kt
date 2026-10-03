@@ -30,9 +30,6 @@ internal class ShadersAndroidLibraryPlugin : Plugin<Project> {
         with(target) {
             apply(plugin = "com.android.library")
             apply(plugin = "app.soulcramer.shaders.android")
-            android {
-                resourcePrefix = "spark_"
-            }
             androidLibrary {
                 defaultConfig {
                     consumerProguardFile("consumer-rules.pro")

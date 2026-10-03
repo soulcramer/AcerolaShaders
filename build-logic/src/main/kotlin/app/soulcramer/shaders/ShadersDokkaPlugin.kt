@@ -30,8 +30,6 @@ import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.dokka.gradle.DokkaExtension
 import org.jetbrains.dokka.gradle.engine.plugins.DokkaHtmlPluginParameters
-import java.io.File
-import java.net.URI
 import java.time.Year
 
 internal class ShadersDokkaPlugin : Plugin<Project> {
@@ -51,23 +49,11 @@ internal class ShadersDokkaPlugin : Plugin<Project> {
     }
 
     private fun Project.configureRootProject() = configure<DokkaExtension> {
-        moduleName = "Spark"
+        moduleName = "Acerola Shaders"
         dokkaPublications.named("html") {
             outputDirectory = layout.buildDirectory.dir("dokka")
         }
-        pluginsConfiguration.withType<DokkaHtmlPluginParameters>().configureEach {
-            fun File.recursiveAssets() = walk().filter(File::isFile)
-                // https://github.com/Kotlin/dokka/issues/3400
-                .filter { runCatching { URI(it.name) }.isSuccess }
-                .toList()
-            // https://kotlinlang.org/docs/dokka-html.html#customize-assets
-            customAssets.from(
-                file("art/logo-icon.svg"), // https://kotlinlang.org/docs/dokka-html.html#change-the-logo
-                rootDir.resolve("art").recursiveAssets(),
-                rootDir.resolve("spark-screenshot-testing/src/test/snapshots/images").recursiveAssets(),
-            )
-            configureFooterMessage()
-        }
+        pluginsConfiguration.withType<DokkaHtmlPluginParameters>().configureEach { configureFooterMessage() }
     }
 
     private fun Project.configureSubProject() {
@@ -82,15 +68,10 @@ internal class ShadersDokkaPlugin : Plugin<Project> {
                     .filter { it.isFile && it.extension == "md" }.toList()
                     .let { includes.from(project.files(), it) }
 
-                // List of files or directories containing sample code (referenced with @sample tags)
-                projectDir.resolve("samples").walk()
-                    .filter { it.isFile && it.extension == "kt" }.toList()
-                    .let { samples.from(it) }
-
                 // https://kotlinlang.org/docs/dokka-gradle.html#source-link-configuration
                 sourceLink {
                     localDirectory = projectDir.resolve("src")
-                    remoteUrl("https://github.com/Adevinta/spark-android/tree/main/${project.name}/src/main/kotlin")
+                    remoteUrl("https://github.com/soulcramer/AcerolaShaders/tree/main/${project.name}/src")
                     remoteLineSuffix = "#L"
                 }
             }
@@ -99,6 +80,6 @@ internal class ShadersDokkaPlugin : Plugin<Project> {
     }
 
     private fun DokkaHtmlPluginParameters.configureFooterMessage() {
-        footerMessage = "© ${Year.now().value} Adevinta"
+        footerMessage = "© ${Year.now().value} Scott Rayapoullé"
     }
 }

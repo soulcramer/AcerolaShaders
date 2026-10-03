@@ -3,7 +3,7 @@ package app.soulcramer.shaders
 import org.intellij.lang.annotations.Language
 
 @Language("agsl")
-public val ColorBlindness: String = """
+internal val ColorBlindness: String = """
 const float3x3 protanomaly0  = float3x3(
 float3(1.0, 0.0, 0.0),
 float3(0.0, 1.0, 0.0),

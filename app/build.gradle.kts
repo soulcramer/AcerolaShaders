@@ -24,8 +24,6 @@ import java.util.Properties
 plugins {
     id("app.soulcramer.shaders.android-application")
     id("app.soulcramer.shaders.android-compose")
-    id("kotlin-parcelize")
-    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -37,8 +35,6 @@ android {
             versionName = version.toString().replace("SNAPSHOT", System.getenv("GITHUB_SHA").take(7))
         }
     }
-
-    compileOptions.isCoreLibraryDesugaringEnabled = true
 
     val keystore = rootProject.file("keystore.properties")
         .takeIf { it.exists() }
@@ -58,39 +54,19 @@ android {
     }
 }
 
-kotlin {
-    compilerOptions {
-        freeCompilerArgs.addAll(
-            "-opt-in=app.soulcramer.shaders.InternalSparkApi",
-            "-opt-in=app.soulcramer.shaders.ExperimentalSparkApi",
-        )
-    }
-}
-
 dependencies {
     implementation(projects.colorblindness)
-
-    implementation(libs.kotlin.reflect)
-    implementation(libs.kotlinx.collections.immutable)
-
-    implementation(libs.accompanist.testharness)
-    implementation(libs.accompanist.drawablepainter)
 
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.compose.material.iconsExtended)
     implementation(libs.androidx.compose.material3)
 
     implementation(libs.androidx.activity)
     implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.appCompat)
     implementation(libs.androidx.navigation.compose)
 
-    implementation(libs.androidx.datastore)
-    implementation(libs.kotlinx.serialization.json)
-
-    coreLibraryDesugaring(libs.desugarJdkLibs)
+    implementation(libs.coilCompose)
 
     debugImplementation(libs.androidx.compose.ui.tooling)
 }

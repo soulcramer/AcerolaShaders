@@ -96,9 +96,9 @@ internal class ShadersPublishingPlugin : Plugin<Project> {
     }
 
     private fun MavenPublication.configurePom() = pom {
-        name = "Spark"
-        description = "Spark Design System"
-        url = "https://github.com/adevinta/spark-android"
+        name = "Acerola Shaders"
+        description = "Acerola Shaders"
+        url = "https://github.com/soulcramer/AcerolaShaders"
         licenses {
             license {
                 name = "MIT License"
@@ -106,12 +106,11 @@ internal class ShadersPublishingPlugin : Plugin<Project> {
             }
         }
         scm {
-            url = "https://github.com/adevinta/spark-android"
+            url = "https://github.com/soulcramer/AcerolaShaders"
         }
         developers {
             developer {
-                name = "Adevinta Engineers"
-                email = "engineers@adevinta.com"
+                name = "Scott Rayapoullé"
             }
         }
     }

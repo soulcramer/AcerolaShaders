@@ -3,15 +3,15 @@ package app.soulcramer.shaders
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement.Absolute.spacedBy
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -27,8 +27,13 @@ import app.soulcramer.shaders.ui.shaders.colorblindness.ColorBlindScreen
 import app.soulcramer.shaders.ui.shaders.crt.CrtScreen
 import app.soulcramer.shaders.ui.theme.AcerolaShadersTheme
 
-class MainActivity : ComponentActivity() {
+private const val HomeRoute = "home"
+private const val ColorBlindRoute = "colorBlindShader"
+private const val CrtRoute = "crtShader"
+
+internal class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContent {
             AcerolaShadersTheme {
@@ -38,7 +43,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background,
                 ) {
                     val navController = rememberNavController()
-                    AppNavHost(navController = navController)
+                    AppNavHost(navController = navController, modifier = Modifier.safeDrawingPadding())
                 }
             }
         }
@@ -47,7 +52,7 @@ class MainActivity : ComponentActivity() {
 
 // Composable that show a list of card that redirect to the detail screen on click
 @Composable
-fun Home(
+internal fun Home(
     modifier: Modifier = Modifier,
     onShaderClick: (destination: String) -> Unit,
 ) {
@@ -59,59 +64,56 @@ fun Home(
         item {
             ShaderItem(
                 shaderName = "Color Blindness",
-                onItemClick = { onShaderClick("colorBlindShader") },
+                onItemClick = { onShaderClick(ColorBlindRoute) },
             )
         }
         item {
             ShaderItem(
                 shaderName = "CRT",
-                onItemClick = { onShaderClick("crtShader") },
+                onItemClick = { onShaderClick(CrtRoute) },
             )
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ShaderItem(
+internal fun ShaderItem(
     shaderName: String,
     onItemClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     ElevatedCard(onClick = onItemClick, modifier = modifier.fillMaxWidth()) {
-        Box {
-            Text(
-                text = shaderName,
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 24.dp),
-                style = MaterialTheme.typography.bodyLarge,
-            )
-        }
+        Text(
+            text = shaderName,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 24.dp),
+            style = MaterialTheme.typography.bodyLarge,
+        )
     }
 }
 
 @Composable
-fun AppNavHost(
+internal fun AppNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
 ) {
     NavHost(
         navController = navController,
-        startDestination = "home",
+        startDestination = HomeRoute,
     ) {
-        composable("home") {
+        composable(HomeRoute) {
             Home(
                 modifier = modifier,
                 onShaderClick = { navController.navigate(it) },
             )
         }
-        composable("colorBlindShader") { ColorBlindScreen(modifier = modifier) }
-        composable("crtShader") { CrtScreen(modifier = modifier) }
+        composable(ColorBlindRoute) { ColorBlindScreen(modifier = modifier) }
+        composable(CrtRoute) { CrtScreen(modifier = modifier) }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun HomePreview() {
+private fun HomePreview() {
     AcerolaShadersTheme {
         Home(
             modifier = Modifier.fillMaxSize(),

@@ -32,7 +32,7 @@ internal class SparkProperties private constructor(project: Project) {
     private val catalog by lazy(project.rootProject::getVersionsCatalog)
     val libraries by lazy { SparkLibraries(catalog) }
     val versions by lazy { SparkVersions(catalog) }
-    val ciUnitTestVariant = project.providers.gradleProperty("spark.ci-unit-test.variant").orElse("release")
+    val ciUnitTestVariant = project.providers.gradleProperty("spark.ci-unit-test.variant").orElse("debug")
 
     companion object {
         private const val EXT_KEY = "app.soulcramer.shaders.SparkProperties"
@@ -42,12 +42,10 @@ internal class SparkProperties private constructor(project: Project) {
 
 @Suppress("HasPlatformType", "PropertyName")
 internal class SparkVersions(catalog: VersionCatalog) {
-    val `androidx-compose-compiler` by catalog
     val `targetSdk` by catalog
+    val `minSdk` by catalog
     val `minCompileSdk` by catalog
     val `compileSdk` by catalog
-    val `kotlin` by catalog
-    val `showkase` by catalog
     val `ktlint` by catalog
 
     private operator fun VersionCatalog.getValue(
