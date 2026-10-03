@@ -1,6 +1,5 @@
 package app.soulcramer.shaders.ui.shaders.colorblindness
 
-import android.graphics.RuntimeShader
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,9 +13,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import app.soulcramer.shaders.ColorBlindnessShader
+import app.soulcramer.shaders.ColorBlindnessType
+import app.soulcramer.shaders.colorBlindness
 import app.soulcramer.shaders.ui.components.SegmentedButton
 import app.soulcramer.shaders.ui.components.ShaderImage
 import app.soulcramer.shaders.ui.components.ShaderParamLabel
@@ -28,21 +29,17 @@ public fun ColorBlindScreen(
     modifier: Modifier = Modifier,
 ) {
     Column(modifier) {
-        val runtimeShader = remember { RuntimeShader(ColorBlindnessShader) }
-
         var severity by remember { mutableStateOf(0.5f) }
-        val options = ColorBlindNessType.entries.map { it.name }
+        val options = ColorBlindnessType.entries.map { it.name }
         var selectedOption by remember {
             mutableStateOf(options.first())
         }
 
-        ShaderImage(shader = runtimeShader) {
-            runtimeShader.setFloatUniform("severity", severity)
-            runtimeShader.setIntUniform(
-                "colorblindType",
-                ColorBlindNessType.valueOf(selectedOption).ordinal,
-            )
-        }
+        ShaderImage(
+            effect = Modifier
+                .clipToBounds()
+                .colorBlindness(ColorBlindnessType.valueOf(selectedOption), severity),
+        )
 
         ShaderParamLabel(paramName = "Severity: ${(severity * 10).roundToInt()}")
         Slider(
@@ -69,15 +66,6 @@ public fun ColorBlindScreen(
                 .height(48.dp),
         )
     }
-}
-
-/**
- * The ordinal is the `colorblindType` index that `getColorBlindnessMatrix` in the shader expects.
- */
-public enum class ColorBlindNessType {
-    Protanomaly,
-    Deuteranomaly,
-    Tritanomaly,
 }
 
 @Preview

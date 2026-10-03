@@ -19,7 +19,7 @@ Gradle resolves the required JDK on first run through the Foojay toolchain plugi
 | Module | Purpose | Published |
 |---|---|---|
 | `app` | Compose sample app. Shows each shader on a drawable or on a photo-picker image. | No |
-| `colorblindness` | AGSL source for the colour-blindness shader, exposed as a Kotlin string (`ColorBlindnessShader`). | Yes |
+| `colorblindness` | Compose modifier (`Modifier.colorBlindness`) for the colour-blindness shader, and its AGSL source as a Kotlin string (`ColorBlindnessShader`). | Yes |
 | `shaders-bom` | Bill of materials for the published libraries. | Yes |
 
 ## Ported effects
@@ -42,15 +42,25 @@ dependencies {
 }
 ```
 
-Build a `RuntimeShader` from the exposed AGSL source and set its uniforms:
+Apply the `colorBlindness` modifier to the content to filter. The severity runs from 0 (no deficiency) to 1 (full deficiency).
+
+```kotlin
+Image(
+    painter = painter,
+    contentDescription = null,
+    modifier = Modifier.colorBlindness(type = ColorBlindnessType.Deuteranomaly, severity = 0.6f),
+)
+```
+
+To use the shader outside this modifier, build a `RuntimeShader` from the exposed AGSL source and set its uniforms:
 
 ```kotlin
 val runtimeShader = RuntimeShader(ColorBlindnessShader)
 runtimeShader.setFloatUniform("severity", severity)
-runtimeShader.setIntUniform("colorblindType", type.ordinal) // 0 = Protanomaly, 1 = Deuteranomaly, 2 = Tritanomaly
+runtimeShader.setIntUniform("colorblindType", type.code) // 0 = Protanomaly, 1 = Deuteranomaly, 2 = Tritanomaly
 ```
 
-Attach the shader as a `RenderEffect` through `graphicsLayer`, with `composable` as the uniform name for the layer content. See `ShaderImage` in the `app` module for a full example.
+The shader reads its input from the `composable` child shader. Pass `composable` as the uniform name to `RenderEffect.createRuntimeShaderEffect`, or set a child shader with `setInputShader`.
 
 ## Build and verify
 

@@ -38,6 +38,30 @@ internal fun ShaderImage(
     enabled: Boolean = true,
     setUniforms: GraphicsLayerScope.() -> Unit,
 ) {
+    ShaderImage(
+        modifier = modifier,
+        effect = Modifier.graphicsLayer {
+            if (!enabled) return@graphicsLayer
+            clip = true
+            setUniforms()
+            renderEffect = RenderEffect
+                .createRuntimeShaderEffect(
+                    shader, // The RuntimeShader
+                    "composable", // The name of the uniform for the RenderNode content
+                )
+                .asComposeRenderEffect()
+        },
+    )
+}
+
+/**
+ * Shows an image that opens the photo picker on click, with [effect] applied to the drawn image.
+ */
+@Composable
+internal fun ShaderImage(
+    modifier: Modifier = Modifier,
+    effect: Modifier = Modifier,
+) {
     var imageUri: Any? by remember { mutableStateOf(R.drawable.ic_launcher_background) }
 
     val photoPicker = rememberLauncherForActivityResult(
@@ -68,16 +92,6 @@ internal fun ShaderImage(
                     ),
                 )
             }
-            .graphicsLayer {
-                if (!enabled) return@graphicsLayer
-                clip = true
-                setUniforms()
-                renderEffect = RenderEffect
-                    .createRuntimeShaderEffect(
-                        shader, // The RuntimeShader
-                        "composable", // The name of the uniform for the RenderNode content
-                    )
-                    .asComposeRenderEffect()
-            },
+            .then(effect),
     )
 }

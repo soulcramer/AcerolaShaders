@@ -1,5 +1,6 @@
 plugins {
     id("app.soulcramer.shaders.android-library")
+    id("app.soulcramer.shaders.android-compose")
     id("app.soulcramer.shaders.dokka")
     id("app.soulcramer.shaders.publishing")
     id("app.soulcramer.shaders.dependencyGuard")
@@ -8,4 +9,9 @@ plugins {
 
 android {
     namespace = "app.soulcramer.shaders.colorblindness"
+}
+
+dependencies {
+    api(platform(libs.androidx.compose.bom))
+    api(libs.androidx.compose.ui)
 }
