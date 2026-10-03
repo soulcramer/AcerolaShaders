@@ -11,9 +11,10 @@ half4 main(float2 coord) {
         col.rgb /= col.a;
     }
 
-    int p1 = int(min(10, floor(severity * 10.0)));
-    int p2 = int(min(10, floor((severity + 0.1) * 10.0)));
-    float weight = fract(severity * 10.0);
+    float s = saturate(severity);
+    int p1 = int(min(10, floor(s * 10.0)));
+    int p2 = int(min(10, floor((s + 0.1) * 10.0)));
+    float weight = fract(s * 10.0);
 
     float3x3 matrix1 = getColorBlindnessMatrix(colorblindType, p1);
     float3x3 matrix2 = getColorBlindnessMatrix(colorblindType, p2);
