@@ -7,6 +7,9 @@ uniform shader composable;
 
 half4 main(float2 coord) {
     float4 col = composable.eval(coord);
+    if (col.a > 0.0) {
+        col.rgb /= col.a;
+    }
 
     int p1 = int(min(10, floor(severity * 10.0)));
     int p2 = int(min(10, floor((severity + 0.1) * 10.0)));
@@ -23,6 +26,6 @@ half4 main(float2 coord) {
 
     float3 cb = saturate(col.rgb * blindness);
 
-    return float4(cb, 1.0);
+    return float4(cb * col.a, col.a);
 }
 """
