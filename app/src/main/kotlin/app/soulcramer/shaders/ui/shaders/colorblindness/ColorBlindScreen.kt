@@ -38,7 +38,7 @@ public fun ColorBlindScreen(
         ShaderImage(
             effect = Modifier
                 .clipToBounds()
-                .colorBlindness(ColorBlindnessType.valueOf(selectedOption), severity),
+                .colorBlindness(type = ColorBlindnessType.valueOf(selectedOption), severity = { severity }),
         )
 
         ShaderParamLabel(paramName = "Severity: ${(severity * 10).roundToInt()}")
@@ -46,7 +46,7 @@ public fun ColorBlindScreen(
             modifier = Modifier.padding(horizontal = 16.dp),
             value = severity,
             valueRange = 0f..1f,
-            steps = 10,
+            steps = 9,
             onValueChange = {
                 severity = it
             },

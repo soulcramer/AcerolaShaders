@@ -36,6 +36,7 @@ android {
 
 dependencies {
     implementation(projects.colorblindness)
+    implementation(projects.crt)
 
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.ui)

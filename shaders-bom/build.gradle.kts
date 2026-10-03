@@ -8,5 +8,6 @@ dependencies {
     constraints {
         // Declare the dependencies to include in the BoM
         api("app.soulcramer.shaders:colorblindness:$version")
+        api("app.soulcramer.shaders:crt:$version")
     }
 }

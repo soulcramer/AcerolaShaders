@@ -13,8 +13,9 @@ plugins {
 
 dependencies {
     dokka(projects.colorblindness)
+    dokka(projects.crt)
 }
 
 tasks.named("globalCiUnitTest") {
-    dependsOn(":app:ciUnitTest", ":colorblindness:ciUnitTest")
+    dependsOn(":app:ciUnitTest", ":colorblindness:ciUnitTest", ":crt:ciUnitTest")
 }
