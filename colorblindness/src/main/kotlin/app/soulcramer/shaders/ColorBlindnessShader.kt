@@ -10,6 +10,7 @@ half4 main(float2 coord) {
     if (col.a > 0.0) {
         col.rgb /= col.a;
     }
+    col.rgb = saturate(col.rgb);
 
     float s = saturate(severity);
     int p1 = int(min(10, floor(s * 10.0)));
