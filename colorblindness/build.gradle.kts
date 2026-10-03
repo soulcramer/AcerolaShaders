@@ -9,9 +9,15 @@ plugins {
 
 android {
     namespace = "app.soulcramer.shaders.colorblindness"
+    defaultConfig.testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 }
 
 dependencies {
     api(platform(libs.androidx.compose.bom))
     api(libs.androidx.compose.ui)
+
+    testImplementation(libs.junit)
+
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.androidx.test.runner)
 }
