@@ -24,6 +24,7 @@ import java.util.Properties
 plugins {
     id("app.soulcramer.shaders.android-application")
     id("app.soulcramer.shaders.android-compose")
+    id("app.soulcramer.shaders.spotless")
 }
 
 android {
@@ -36,7 +37,7 @@ android {
         }
     }
 
-    val keystore = rootProject.file("keystore.properties")
+    val keystore = isolated.rootProject.projectDirectory.file("keystore.properties").asFile
         .takeIf { it.exists() }
         ?.let { Properties().apply { load(it.inputStream()) } }
 

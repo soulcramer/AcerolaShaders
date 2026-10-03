@@ -24,6 +24,7 @@ plugins {
     id("app.soulcramer.shaders.dokka")
     id("app.soulcramer.shaders.publishing")
     id("app.soulcramer.shaders.dependencyGuard")
+    id("app.soulcramer.shaders.spotless")
 }
 
 android {

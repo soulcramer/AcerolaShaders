@@ -29,8 +29,13 @@ plugins {
 
     id("app.soulcramer.shaders.root")
     id("app.soulcramer.shaders.dokka")
+    id("app.soulcramer.shaders.spotless")
 }
 
-allprojects {
-    apply(plugin = "app.soulcramer.shaders.spotless")
+dependencies {
+    dokka(projects.colorblindness)
+}
+
+tasks.named("globalCiUnitTest") {
+    dependsOn(":app:ciUnitTest", ":colorblindness:ciUnitTest")
 }

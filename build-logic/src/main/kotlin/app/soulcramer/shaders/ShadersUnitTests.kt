@@ -49,26 +49,21 @@ internal object ShadersUnitTests {
         }
 
     fun configureSubproject(project: Project) {
-        val globalTask = project.rootProject.tasks.named(GLOBAL_CI_UNIT_TEST_TASK_NAME)
         project.pluginManager.withPlugin("com.android.base") {
-            createAndroidCiUnitTestTask(project, globalTask)
+            createAndroidCiUnitTestTask(project)
         }
         configureTestTasks(project)
     }
 
-    private fun createAndroidCiUnitTestTask(
-        project: Project,
-        globalTask: TaskProvider<Task>,
-    ) {
+    private fun createAndroidCiUnitTestTask(project: Project) {
         val variant = project.spark().ciUnitTestVariant.get().capitalized()
         val variantUnitTestTaskName = "test${variant}UnitTest"
         val variantCompileUnitTestTaskName = "compile${variant}UnitTestSources"
         project.logger.debug("$LOG Creating CI unit test tasks for project '$project' and variant '$variant'")
-        val ciUnitTest = project.tasks.register(CI_UNIT_TEST_TASK_NAME) {
+        project.tasks.register(CI_UNIT_TEST_TASK_NAME) {
             group = LifecycleBasePlugin.VERIFICATION_GROUP
             dependsOn(variantUnitTestTaskName)
         }
-        globalTask.configure { dependsOn(ciUnitTest) }
         project.tasks.register(COMPILE_CI_UNIT_TEST_NAME) {
             group = LifecycleBasePlugin.VERIFICATION_GROUP
             dependsOn(variantCompileUnitTestTaskName)

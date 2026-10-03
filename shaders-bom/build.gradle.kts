@@ -22,6 +22,7 @@
 plugins {
     `java-platform`
     id("app.soulcramer.shaders.publishing")
+    id("app.soulcramer.shaders.spotless")
 }
 
 dependencies {

@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<lint>
-    <!-- Raising targetSdk changes runtime behaviour; keep it a deliberate decision. -->
-    <issue id="OldTargetApi" severity="ignore" />
-</lint>

@@ -51,7 +51,7 @@ internal class ShadersPublishingPlugin : Plugin<Project> {
         repositories {
             mavenLocal {
                 name = "Local"
-                url = uri(rootProject.layout.buildDirectory.dir(".m2/repository"))
+                url = uri(isolated.rootProject.projectDirectory.dir("build/.m2/repository"))
             }
             maven {
                 name = "OSSRH"

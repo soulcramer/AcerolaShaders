@@ -57,9 +57,6 @@ internal class ShadersDokkaPlugin : Plugin<Project> {
     }
 
     private fun Project.configureSubProject() {
-        // Aggregate this module into the root project documentation
-        rootProject.dependencies.add("dokka", rootProject.dependencies.project(mapOf("path" to path)))
-
         configure<DokkaExtension> {
             dokkaSourceSets.configureEach {
                 // Parse Module and Package docs

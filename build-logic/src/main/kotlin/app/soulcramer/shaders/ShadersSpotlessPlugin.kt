@@ -35,7 +35,14 @@ internal class ShadersSpotlessPlugin : Plugin<Project> {
             val ktlint = spark().versions.ktlint
             configure<SpotlessExtension> {
                 format("misc") {
-                    target("**/*.md", "**/.gitignore")
+                    // A file tree, because Spotless reads the build directory of every subproject
+                    // for `**/` string targets, which isolated projects forbids.
+                    target(
+                        fileTree(projectDir) {
+                            include("**/*.md", "**/.gitignore")
+                            exclude(".git", ".gradle", "**/build")
+                        },
+                    )
                     endWithNewline()
                 }
                 kotlin {
