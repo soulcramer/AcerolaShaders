@@ -26,7 +26,7 @@ half4 main(float2 coord) {
 
     float3x3 blindness = float3x3(newCB1, newCB2, newCB3);
 
-    float3 cb = saturate(col.rgb * blindness);
+    float3 cb = fromLinearSrgb(saturate(toLinearSrgb(col.rgb) * blindness));
 
     return float4(cb * col.a, col.a);
 }
