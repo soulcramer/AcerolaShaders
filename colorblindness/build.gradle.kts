@@ -5,6 +5,7 @@ plugins {
     id("app.soulcramer.shaders.publishing")
     id("app.soulcramer.shaders.dependencyGuard")
     id("app.soulcramer.shaders.spotless")
+    id("app.soulcramer.shaders.screenshot")
 }
 
 android {
@@ -17,6 +18,7 @@ dependencies {
     api(libs.androidx.compose.ui)
 
     testImplementation(libs.junit)
+    testImplementation(libs.androidx.compose.foundation)
 
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.runner)

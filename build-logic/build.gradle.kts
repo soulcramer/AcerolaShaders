@@ -5,14 +5,14 @@ plugins {
     alias(libs.plugins.spotless)
 }
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 kotlin {
     compilerOptions {
         allWarningsAsErrors = true
-        jvmTarget = JvmTarget.JVM_17
+        jvmTarget = JvmTarget.JVM_21
     }
     explicitApi()
 }
@@ -28,6 +28,7 @@ dependencies {
     compileOnly(libs.gradlePlugins.compose)
     compileOnly(libs.gradlePlugins.dependencyGuard)
     compileOnly(libs.gradlePlugins.dokka)
+    compileOnly(libs.gradlePlugins.paparazzi)
     compileOnly(libs.gradlePlugins.spotless)
     implementation(libs.dokka.base)
 }
@@ -46,6 +47,7 @@ gradlePlugin {
         create("app.soulcramer.shaders.ShadersDokkaPlugin", id = "app.soulcramer.shaders.dokka")
         create("app.soulcramer.shaders.ShadersDependencyGuardPlugin", id = "app.soulcramer.shaders.dependencyGuard")
         create("app.soulcramer.shaders.ShadersSpotlessPlugin", id = "app.soulcramer.shaders.spotless")
+        create("app.soulcramer.shaders.ShadersScreenshotPlugin", id = "app.soulcramer.shaders.screenshot")
     }
 }
 

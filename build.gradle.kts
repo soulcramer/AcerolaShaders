@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.dependencyGuard) apply false
     alias(libs.plugins.spotless) apply false
     alias(libs.plugins.compose) apply false
+    alias(libs.plugins.paparazzi) apply false
 
     id("app.soulcramer.shaders.root")
     id("app.soulcramer.shaders.dokka")

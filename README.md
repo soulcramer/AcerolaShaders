@@ -65,6 +65,16 @@ runtimeShader.setIntUniform("colorblindType", type.code) // 0 = Protanomaly, 1 =
 
 The shader reads its input from the `composable` child shader. Pass `composable` as the uniform name to `RenderEffect.createRuntimeShaderEffect`, or set a child shader with `setInputShader`.
 
+The images below are the Paparazzi reference images for `ColorBlindnessScreenshotTest`. A change to the shader or the modifier fails the test until the images are recorded again.
+
+| Case | Image | Shows |
+|---|---|---|
+| `original` | ![Sample image with no filter applied](colorblindness/src/test/snapshots/images/app.soulcramer.shaders_ColorBlindnessScreenshotTest_original.png) | The unfiltered sample image: red, green, and blue grids, a hue gradient, a chequerboard, and a grey ramp. |
+| `protanomaly` | ![Sample image with full protanomaly](colorblindness/src/test/snapshots/images/app.soulcramer.shaders_ColorBlindnessScreenshotTest_protanomaly.png) | Full protanomaly (severity 1). Red and green shift towards olive and yellow; blue stays close to its original hue. |
+| `deuteranomaly` | ![Sample image with full deuteranomaly](colorblindness/src/test/snapshots/images/app.soulcramer.shaders_ColorBlindnessScreenshotTest_deuteranomaly.png) | Full deuteranomaly (severity 1). Similar to protanomaly: red and green both shift towards yellow. |
+| `tritanomaly` | ![Sample image with full tritanomaly](colorblindness/src/test/snapshots/images/app.soulcramer.shaders_ColorBlindnessScreenshotTest_tritanomaly.png) | Full tritanomaly (severity 1). Red stays close to its original hue; green shifts towards cyan and blue towards teal. |
+| `deuteranomalySeverity50` | ![Sample image with deuteranomaly at severity 0.5](colorblindness/src/test/snapshots/images/app.soulcramer.shaders_ColorBlindnessScreenshotTest_deuteranomalySeverity50.png) | Deuteranomaly at severity 0.5, halfway between `original` and `deuteranomaly`. |
+
 ## Use the CRT shader
 
 Add the BOM, then the library, to a module that uses Jetpack Compose.
@@ -102,14 +112,26 @@ The scanline spacing follows the screen density, so the lines keep the same phys
 
 To use the shader outside this modifier, build a `RuntimeShader` from `CrtShader`. The KDoc of `CrtShader` lists its uniforms. The shader also reads its input from the `composable` child shader.
 
+The images below are the Paparazzi reference images for `CrtScreenshotTest`. A change to the shader or the modifier fails the test until the images are recorded again.
+
+| Case | Image | Shows |
+|---|---|---|
+| `defaults` | ![Sample image with the default CRT settings](crt/src/test/snapshots/images/app.soulcramer.shaders_CrtScreenshotTest_defaults.png) | `Modifier.crt()` with every `CrtDefaults` value, including `lineSize` 0. The barrel warp and vignette show; the scanlines are thin. |
+| `lineSize2` | ![Sample image with CRT lineSize set to 2](crt/src/test/snapshots/images/app.soulcramer.shaders_CrtScreenshotTest_lineSize2.png) | `lineSize = 2`. The scanlines widen into bands with visible colour fringing. |
+
 ## Build and verify
 
 ```bash
-./gradlew assembleDebug      # build the app and the libraries
-./gradlew spotlessCheck      # check formatting
-./gradlew lintDebug          # run Android Lint on every module
-./gradlew :dokkaGenerate     # generate API docs for the published libraries
+./gradlew assembleDebug          # build the app and the libraries
+./gradlew spotlessCheck          # check formatting
+./gradlew lintDebug              # run Android Lint on every module
+./gradlew :dokkaGenerate         # generate API docs for the published libraries
+./gradlew recordPaparazziDebug   # record the shader screenshot references
+./gradlew verifyPaparazziDebug   # compare the shaders against the recorded references
+./gradlew globalCiUnitTest       # unit tests and screenshot verification for every module, as CI runs them
 ```
+
+`testDebugUnitTest` alone runs the unit tests but does not compare screenshots. CI runs `globalCiUnitTest` from [`.github/workflows/screenshots.yml`](.github/workflows/screenshots.yml) on each pull request.
 
 ## Requirements
 
