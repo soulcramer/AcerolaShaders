@@ -23,7 +23,8 @@ SOFTWARE.
 ---
 
 The AGSL shaders in this project are ports of shaders from AcerolaFX
-(https://github.com/GarrettGunnell/AcerolaFX), which uses this licence:
+(https://github.com/GarrettGunnell/AcerolaFX) and Post-Processing
+(https://github.com/GarrettGunnell/Post-Processing), which use this licence:
 
 MIT License
 

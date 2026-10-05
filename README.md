@@ -1,6 +1,6 @@
 # AcerolaShaders
 
-Android ports of shader effects by Garrett Gunnell (Acerola), written in AGSL and run through `RuntimeShader`. The project follows [AcerolaFX](https://github.com/GarrettGunnell/AcerolaFX) and [CRT-Shader](https://github.com/GarrettGunnell/CRT-Shader).
+Android ports of shader effects by Garrett Gunnell (Acerola), written in AGSL and run through `RuntimeShader`. The project follows [AcerolaFX](https://github.com/GarrettGunnell/AcerolaFX), [CRT-Shader](https://github.com/GarrettGunnell/CRT-Shader), and [Post-Processing](https://github.com/GarrettGunnell/Post-Processing).
 
 ## Quick start
 
@@ -21,6 +21,8 @@ Gradle resolves the required JDK on first run through the Foojay toolchain plugi
 | `app` | Compose sample app. Shows each shader on a drawable or on a photo-picker image. | No |
 | `colorblindness` | Compose modifier (`Modifier.colorBlindness`) for the colour-blindness shader, and its AGSL source as a Kotlin string (`ColorBlindnessShader`). | Yes |
 | `crt` | Compose modifier (`Modifier.crt`) for the CRT shader, and its AGSL source as a Kotlin string (`CrtShader`). | Yes |
+| `differenceofgaussians` | Compose modifier (`Modifier.differenceOfGaussians`) for the difference of Gaussians shader, and its AGSL sources as Kotlin strings (`DifferenceOfGaussiansBlurShader`, `DifferenceOfGaussiansThresholdShader`). | Yes |
+| `shaders-core` | The `RenderPassChain` helper, which chains `RuntimeShader` passes into one render effect. | Yes |
 | `shaders-bom` | Bill of materials for the published libraries. | Yes |
 
 ## Ported effects
@@ -29,8 +31,9 @@ Gradle resolves the required JDK on first run through the Foojay toolchain plugi
 |---|---|---|
 | Colour blindness simulation (protanomaly, deuteranomaly, tritanomaly) | `AcerolaFX_ColorBlindness.fx` in AcerolaFX | Ported |
 | CRT screen (barrel warp, scanline colour fringing, vignette) | `AcerolaFX_CRT.fx` in AcerolaFX | Ported |
+| Difference of Gaussians edge lines | `DifferenceOfGaussians.shader` in Post-Processing | Ported |
 
-The colour-blindness effect lives in the `colorblindness` library and the CRT effect lives in the `crt` library.
+The colour-blindness effect lives in the `colorblindness` library, the CRT effect lives in the `crt` library, and the difference of Gaussians effect lives in the `differenceofgaussians` library.
 
 ## Use the colour-blindness shader
 
@@ -119,6 +122,67 @@ The images below are the Paparazzi reference images for `CrtScreenshotTest`. A c
 | `defaults` | ![Sample image with the default CRT settings](crt/src/test/snapshots/images/app.soulcramer.shaders_CrtScreenshotTest_defaults.png) | `Modifier.crt()` with every `CrtDefaults` value, including `lineSize` 0. The barrel warp and vignette show; the scanlines are thin. |
 | `lineSize2` | ![Sample image with CRT lineSize set to 2](crt/src/test/snapshots/images/app.soulcramer.shaders_CrtScreenshotTest_lineSize2.png) | `lineSize = 2`. The scanlines widen into bands with visible colour fringing. |
 
+## Use the difference of Gaussians shader
+
+Add the BOM, then the library, to a module that uses Jetpack Compose.
+
+```kotlin
+dependencies {
+    implementation(platform("app.soulcramer.shaders:shaders-bom:<version>"))
+    implementation("app.soulcramer.shaders:differenceofgaussians")
+}
+```
+
+Apply the `differenceOfGaussians` modifier to the content to filter. With the defaults, the modifier draws white edge lines on black. Every parameter has the `DifferenceOfGaussians.cs` default, and `DifferenceOfGaussiansDefaults` holds these values. The `sigma`, `sigmaScale`, `tau`, `phi`, and `threshold` parameters are lambdas, for the same reason as the `crt` modifier. The `kernelRadius`, `thresholding`, `tanh`, and `invert` parameters are plain values, because they change in whole steps or as toggles. The modifier keeps the alpha of the content.
+
+```kotlin
+var sigma by remember { mutableFloatStateOf(DifferenceOfGaussiansDefaults.SIGMA) }
+
+Image(
+    painter = painter,
+    contentDescription = null,
+    modifier = Modifier
+        .clipToBounds()
+        .differenceOfGaussians(sigma = { sigma }),
+)
+```
+
+| Parameter | Range | Default | Effect |
+|---|---|---|---|
+| `kernelRadius` | 1 to 10 | 5 | Radius of the blur, in pixels. |
+| `sigma` | 0.1 to 5 | 2 | Standard deviation of the first Gaussian blur. |
+| `sigmaScale` | 0.1 to 5 | 1.6 | Scale from `sigma` to the standard deviation of the second Gaussian blur. |
+| `tau` | 0.01 to 5 | 1 | Weight of the second Gaussian in the difference. |
+| `thresholding` | on or off | on | When on, a value at or above `threshold` becomes white and every other value becomes black. |
+| `tanh` | on or off | off | When on and `thresholding` is on, a value below `threshold` falls off smoothly instead of becoming black. |
+| `phi` | 0.01 to 100 | 1 | Steepness of the `tanh` fall-off. |
+| `threshold` | -1 to 1 | 0.005 | Threshold of the difference. |
+| `invert` | on or off | off | When on, the modifier inverts the result. |
+
+To use the shaders outside this modifier, build a `RuntimeShader` from `DifferenceOfGaussiansBlurShader` for the first pass and `DifferenceOfGaussiansThresholdShader` for the second pass. The KDoc of each lists its uniforms. [`RenderPassChain`](#chain-shader-passes) chains the two passes.
+
+The images below are the Paparazzi reference images for `DifferenceOfGaussiansScreenshotTest`. A change to the shaders or the modifier fails the test until the images are recorded again.
+
+| Case | Image | Shows |
+|---|---|---|
+| `defaults` | ![Sample image with the default difference of Gaussians settings](differenceofgaussians/src/test/snapshots/images/app.soulcramer.shaders_DifferenceOfGaussiansScreenshotTest_defaults.png) | `Modifier.differenceOfGaussians()` with every `DifferenceOfGaussiansDefaults` value. White grid lines show on black, with a soft horizontal line and two blocks where the sample image has a hard edge. |
+| `tanhInvert` | ![Sample image with tanh and invert enabled and phi set to 50](differenceofgaussians/src/test/snapshots/images/app.soulcramer.shaders_DifferenceOfGaussiansScreenshotTest_tanhInvert.png) | `tanh = true`, `phi = 50`, `invert = true`. The same grid lines show in black on a light grey background, with soft, grey fall-off instead of hard edges. |
+
+## Chain shader passes
+
+`RenderPassChain`, in the `shaders-core` library, applies a list of `RuntimeShader` passes in order as one render effect. Pass 0 reads the content, and each later pass reads only the output of the previous pass. The chain sets `size` on every pass and caches the built effect, so a caller gets a new effect only when the width, the height, or the caller's own uniform value changes. `DifferenceOfGaussiansNode` uses it to chain the blur pass and the threshold pass.
+
+The chain also supports a one-pass effect added back onto the original content, through `RenderEffect.createBlendModeEffect(RenderEffect.createOffsetEffect(0f, 0f), chain, BlendMode.PLUS)` with `BlendMode.PLUS`.
+
+The images below are the Paparazzi reference images for `RenderPassChainScreenshotTest`.
+
+| Case | Image | Shows |
+|---|---|---|
+| `ramp` | ![Red ramp chained through two passes](shaders-core/src/test/snapshots/images/app.soulcramer.shaders_RenderPassChainScreenshotTest_ramp.png) | A two-pass chain: pass 1 writes a red ramp from 0 to 1/16, and pass 2 scales it back to the full range. The output shows 17 distinct bands, from the 8-bit store between the passes. |
+| `blendPlus` | ![Green ramp added onto a dark red background with PLUS](shaders-core/src/test/snapshots/images/app.soulcramer.shaders_RenderPassChainScreenshotTest_blendPlus.png) | A one-pass green ramp, added onto a `0x40` red background with `BlendMode.PLUS`. The left edge stays dark red and olive, and the right edge is bright green. |
+
+A probe on a Pixel 8 Pro (API 37) rendered the `ramp` case at 256 x 16 px and counted 17 distinct red values across the row, with a maximum difference of 8 out of 255 from the expected ramp value. Paparazzi gave the same 17 bands. This matches 8-bit premultiplied RGBA intermediates, where each store rounds a value by up to 0.5 / 255. Later chained ports use 8-bit intermediates. The difference of Gaussians modifier uses two passes and one store, so its own error is at most `(1 + tau) × 0.5 / 255`, below its default threshold of 0.005.
+
 ## Build and verify
 
 ```bash
@@ -141,7 +205,7 @@ The images below are the Paparazzi reference images for `CrtScreenshotTest`. A c
 
 ## Credits
 
-The shaders are ports of effects from [AcerolaFX](https://github.com/GarrettGunnell/AcerolaFX) by Garrett Gunnell (Acerola), which uses the MIT licence. [CRT-Shader](https://github.com/GarrettGunnell/CRT-Shader) shows the same CRT effect in Unity, but this project copies no code from it.
+The shaders are ports of effects from [AcerolaFX](https://github.com/GarrettGunnell/AcerolaFX) and [Post-Processing](https://github.com/GarrettGunnell/Post-Processing), both by Garrett Gunnell (Acerola) and both under the MIT licence. [CRT-Shader](https://github.com/GarrettGunnell/CRT-Shader) shows the same CRT effect in Unity, but this project copies no code from it.
 
 ## Licence
 
