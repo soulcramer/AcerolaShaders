@@ -38,6 +38,7 @@ dependencies {
     implementation(projects.colorblindness)
     implementation(projects.crt)
     implementation(projects.differenceofgaussians)
+    implementation(projects.paletteswap)
 
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.ui)
@@ -49,6 +50,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
 
     implementation(libs.coilCompose)
+    implementation(libs.colorpickerCompose)
 
     debugImplementation(libs.androidx.compose.ui.tooling)
 }

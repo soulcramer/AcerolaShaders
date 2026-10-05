@@ -16,6 +16,7 @@ dependencies {
     dokka(projects.colorblindness)
     dokka(projects.crt)
     dokka(projects.differenceofgaussians)
+    dokka(projects.paletteswap)
     dokka(projects.shadersCore)
 }
 
@@ -25,6 +26,7 @@ tasks.named("globalCiUnitTest") {
         ":colorblindness:ciUnitTest",
         ":crt:ciUnitTest",
         ":differenceofgaussians:ciUnitTest",
+        ":paletteswap:ciUnitTest",
         ":shaders-core:ciUnitTest",
     )
 }

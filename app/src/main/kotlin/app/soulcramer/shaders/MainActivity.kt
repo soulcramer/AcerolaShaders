@@ -26,12 +26,14 @@ import androidx.navigation.compose.rememberNavController
 import app.soulcramer.shaders.ui.shaders.colorblindness.ColorBlindScreen
 import app.soulcramer.shaders.ui.shaders.crt.CrtScreen
 import app.soulcramer.shaders.ui.shaders.differenceofgaussians.DifferenceOfGaussiansScreen
+import app.soulcramer.shaders.ui.shaders.paletteswap.PaletteSwapScreen
 import app.soulcramer.shaders.ui.theme.AcerolaShadersTheme
 
 private const val HomeRoute = "home"
 private const val ColorBlindRoute = "colorBlindShader"
 private const val CrtRoute = "crtShader"
 private const val DifferenceOfGaussiansRoute = "differenceOfGaussiansShader"
+private const val PaletteSwapRoute = "paletteSwapShader"
 
 internal class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,6 +83,12 @@ internal fun Home(
                 onItemClick = { onShaderClick(DifferenceOfGaussiansRoute) },
             )
         }
+        item {
+            ShaderItem(
+                shaderName = "Palette Swap",
+                onItemClick = { onShaderClick(PaletteSwapRoute) },
+            )
+        }
     }
 }
 
@@ -117,6 +125,7 @@ internal fun AppNavHost(
         composable(ColorBlindRoute) { ColorBlindScreen(modifier = modifier) }
         composable(CrtRoute) { CrtScreen(modifier = modifier) }
         composable(DifferenceOfGaussiansRoute) { DifferenceOfGaussiansScreen(modifier = modifier) }
+        composable(PaletteSwapRoute) { PaletteSwapScreen(modifier = modifier) }
     }
 }
 

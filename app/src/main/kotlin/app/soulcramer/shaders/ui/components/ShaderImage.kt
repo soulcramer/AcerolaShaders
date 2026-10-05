@@ -55,7 +55,7 @@ internal fun ShaderImage(
             .clickable {
                 photoPicker.launch(
                     PickVisualMediaRequest(
-                        ActivityResultContracts.PickVisualMedia.ImageOnly,
+                        ActivityResultContracts.PickVisualMedia.ImageAndVideo,
                     ),
                 )
             }

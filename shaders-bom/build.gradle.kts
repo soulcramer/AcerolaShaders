@@ -10,6 +10,7 @@ dependencies {
         api("app.soulcramer.shaders:colorblindness:$version")
         api("app.soulcramer.shaders:crt:$version")
         api("app.soulcramer.shaders:differenceofgaussians:$version")
+        api("app.soulcramer.shaders:paletteswap:$version")
         api("app.soulcramer.shaders:shaders-core:$version")
     }
 }
