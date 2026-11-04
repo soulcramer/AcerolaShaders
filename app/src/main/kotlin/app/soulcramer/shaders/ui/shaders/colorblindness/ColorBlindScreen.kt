@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import app.soulcramer.shaders.ColorBlindnessType
 import app.soulcramer.shaders.colorBlindness
 import app.soulcramer.shaders.ui.components.SegmentedButton
-import app.soulcramer.shaders.ui.components.ShaderImage
+import app.soulcramer.shaders.ui.components.ShaderMedia
 import app.soulcramer.shaders.ui.components.ShaderParamLabel
 import app.soulcramer.shaders.ui.theme.AcerolaShadersTheme
 import kotlin.math.roundToInt
@@ -35,7 +35,8 @@ public fun ColorBlindScreen(
             mutableStateOf(options.first())
         }
 
-        ShaderImage(
+        ShaderMedia(
+            mediaKey = "colorBlindness",
             effect = Modifier
                 .clipToBounds()
                 .colorBlindness(type = ColorBlindnessType.valueOf(selectedOption), severity = { severity }),

@@ -41,7 +41,7 @@ import app.soulcramer.shaders.oklchPalette
 import app.soulcramer.shaders.paletteSwap
 import app.soulcramer.shaders.randomPalette
 import app.soulcramer.shaders.ui.components.SegmentedButton
-import app.soulcramer.shaders.ui.components.ShaderImage
+import app.soulcramer.shaders.ui.components.ShaderMedia
 import app.soulcramer.shaders.ui.components.ShaderParamLabel
 import app.soulcramer.shaders.ui.theme.AcerolaShadersTheme
 import com.github.skydoves.colorpicker.compose.HsvColorPicker
@@ -83,7 +83,8 @@ public fun PaletteSwapScreen(
     }
 
     Column(modifier.verticalScroll(rememberScrollState())) {
-        ShaderImage(
+        ShaderMedia(
+            mediaKey = "paletteSwap",
             effect = if (enabled) {
                 Modifier
                     .clipToBounds()
