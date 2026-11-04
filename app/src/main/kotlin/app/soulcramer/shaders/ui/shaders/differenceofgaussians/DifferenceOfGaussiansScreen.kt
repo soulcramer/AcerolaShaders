@@ -20,7 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.soulcramer.shaders.DifferenceOfGaussiansDefaults
 import app.soulcramer.shaders.differenceOfGaussians
-import app.soulcramer.shaders.ui.components.ShaderImage
+import app.soulcramer.shaders.ui.components.ShaderMedia
 import app.soulcramer.shaders.ui.components.ShaderParamLabel
 import app.soulcramer.shaders.ui.theme.AcerolaShadersTheme
 import kotlin.math.roundToInt
@@ -41,7 +41,8 @@ public fun DifferenceOfGaussiansScreen(
     var invert by remember { mutableStateOf(DifferenceOfGaussiansDefaults.INVERT) }
 
     Column(modifier.verticalScroll(rememberScrollState())) {
-        ShaderImage(
+        ShaderMedia(
+            mediaKey = "differenceOfGaussians",
             effect = if (enabled) {
                 Modifier
                     .clipToBounds()

@@ -20,7 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.soulcramer.shaders.CrtDefaults
 import app.soulcramer.shaders.crt
-import app.soulcramer.shaders.ui.components.ShaderImage
+import app.soulcramer.shaders.ui.components.ShaderMedia
 import app.soulcramer.shaders.ui.components.ShaderParamLabel
 import app.soulcramer.shaders.ui.theme.AcerolaShadersTheme
 import kotlin.math.roundToInt
@@ -37,7 +37,8 @@ public fun CrtScreen(
     var brightnessAdjust by remember { mutableFloatStateOf(CrtDefaults.BRIGHTNESS_ADJUST) }
 
     Column(modifier.verticalScroll(rememberScrollState())) {
-        ShaderImage(
+        ShaderMedia(
+            mediaKey = "crt",
             effect = if (enabled) {
                 Modifier
                     .clipToBounds()

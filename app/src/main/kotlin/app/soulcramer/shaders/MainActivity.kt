@@ -28,6 +28,9 @@ import app.soulcramer.shaders.ui.shaders.crt.CrtScreen
 import app.soulcramer.shaders.ui.shaders.differenceofgaussians.DifferenceOfGaussiansScreen
 import app.soulcramer.shaders.ui.shaders.paletteswap.PaletteSwapScreen
 import app.soulcramer.shaders.ui.theme.AcerolaShadersTheme
+import coil3.ImageLoader
+import coil3.compose.setSingletonImageLoaderFactory
+import io.github.vinceglb.filekit.coil.addPlatformFileSupport
 
 private const val HomeRoute = "home"
 private const val ColorBlindRoute = "colorBlindShader"
@@ -40,6 +43,11 @@ internal class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContent {
+            setSingletonImageLoaderFactory { context ->
+                ImageLoader.Builder(context)
+                    .components { addPlatformFileSupport() }
+                    .build()
+            }
             AcerolaShadersTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
